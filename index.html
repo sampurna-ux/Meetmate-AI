@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetMate AI | Meeting-to-Action Assistant</title>
+<style>
+:root{--ink:#21194d;--purple:#6b4eff;--lav:#f3efff;--lime:#e6f45c;--muted:#77738e;--line:#e8e3f4;--white:#fff;--green:#16865b;--red:#bd4c5a}
+*{box-sizing:border-box}body{margin:0;background:#f7f5fc;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:var(--ink);color:white;padding:22px max(20px,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:13px;background:var(--lime);color:var(--ink);display:grid;place-items:center;font-size:23px;font-weight:900}
+.brand h1{font-size:19px;margin:0}.brand small{color:#c8c1e9;letter-spacing:.12em;font-size:10px}
+.pill{border:1px solid #655c8c;border-radius:99px;padding:7px 12px;color:#e9e5ff;font-size:12px}
+main{max-width:1120px;margin:28px auto;padding:0 18px 50px}.hero{background:linear-gradient(120deg,#e9e2ff,#f6f3ff);border:1px solid #ded5ff;border-radius:22px;padding:25px 28px;margin-bottom:22px}
+.eyebrow{font-size:11px;letter-spacing:.16em;font-weight:800;color:#7258d8}.hero h2{font-size:clamp(25px,4vw,38px);margin:8px 0}.hero p{color:#5e5879;max-width:720px;line-height:1.6;margin:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 20px #24164a0a}
+.card h3{margin:0 0 6px;font-size:17px}.sub{color:var(--muted);font-size:13px;margin:0 0 15px;line-height:1.5}
+textarea{width:100%;min-height:240px;resize:vertical;border:1px solid #dcd5ef;border-radius:12px;padding:14px;font:14px/1.65 inherit;color:var(--ink);outline:none}textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px #6b4eff18}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}button{border:0;border-radius:10px;padding:11px 15px;font-weight:750;cursor:pointer;font-size:13px}
+.primary{background:var(--purple);color:white}.secondary{background:var(--lav);color:var(--ink)}.ghost{background:white;border:1px solid var(--line);color:var(--ink)}button:hover{filter:brightness(.97);transform:translateY(-1px)}
+.notice{background:#fff9df;border:1px solid #f1e5a2;border-radius:11px;padding:11px 13px;color:#69571a;font-size:12px;line-height:1.5;margin-top:13px}
+.full{grid-column:1/-1}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:15px}.stat strong{font-size:25px;display:block}.stat span{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:3px 0 13px}.section-head h3{margin:0}
+.tag{font-size:11px;font-weight:800;border-radius:99px;padding:5px 9px;background:#f0edff;color:#654bd1}.tag.warn{background:#fff2dc;color:#98620c}.tag.ok{background:#e5f7ef;color:#18724f}
+.summary{line-height:1.65;color:#45405e;font-size:14px;white-space:pre-wrap}
+table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;color:#77738e;font-size:10px;text-transform:uppercase;letter-spacing:.08em;background:#faf9fd}td,th{padding:11px 9px;border-bottom:1px solid var(--line);vertical-align:top}td input,td select{width:100%;min-width:75px;border:1px solid #e3def0;border-radius:7px;padding:7px;color:var(--ink);background:white;font:12px inherit}
+.table-wrap{overflow:auto}.empty{color:#858099;font-size:13px;padding:20px;text-align:center;border:1px dashed #d9d2e9;border-radius:12px}
+.bullet-list{padding-left:19px;color:#49435f;font-size:14px;line-height:1.8}.flag{padding:12px;border-radius:10px;background:#fff4f2;border:1px solid #f4d8d5;color:#86434b;font-size:13px;margin:8px 0}
+.footer{text-align:center;color:#8c879e;font-size:11px;margin-top:24px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.stats{grid-template-columns:repeat(2,1fr)}header{padding:16px 18px}.pill{display:none}main{margin-top:18px}.hero{padding:21px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">M</div><div><h1>MeetMate AI</h1><small>MEETING → ACTION ASSISTANT</small></div></div><div class="pill">PS 03 · AGENTIC CHASE</div></header>
+<main>
+<section class="hero"><div class="eyebrow">YOUR TEAM'S MEETING COPILOT</div><h2>Turn conversations into clear next steps.</h2><p>Paste a meeting transcript to organise decisions, action items, owners and deadlines. Review incomplete information before your team acts on it.</p></section>
+<div class="grid">
+<section class="card">
+<h3>1. Meeting transcript</h3><p class="sub">Paste the transcript below. For this standalone demo, analysis runs in your browser using lightweight rules—not a live AI model.</p>
+<textarea id="transcript" placeholder="Paste your meeting transcript here..."></textarea>
+<div class="actions"><button class="primary" id="analyze">✦ Analyse meeting</button><button class="secondary" id="sample">Load sample</button><button class="ghost" id="clear">Clear</button></div>
+<div class="notice"><b>Demo mode:</b> This prototype demonstrates the workflow. Connect Gemini, Telegram and Google Sheets to make it the full AI-powered automation described in PS03.</div>
+</section>
+<section class="card">
+<h3>2. Meeting summary</h3><p class="sub">A concise overview of the discussion and decisions.</p>
+<div id="summary" class="empty">Your meeting summary will appear here after analysis.</div>
+<div style="margin-top:18px"><div class="section-head"><h3 style="font-size:14px">Key decisions</h3><span class="tag">DECISIONS</span></div><div id="decisions" class="empty">No decisions extracted yet.</div></div>
+</section>
+<section class="card full">
+<div class="section-head"><div><h3>3. Action tracker</h3><p class="sub" style="margin:4px 0 0">Review and edit tasks, owners, deadlines and status.</p></div><span class="tag ok" id="taskCount">0 TASKS</span></div>
+<div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Status</th><th>Notes</th></tr></thead><tbody id="tasks"><tr><td colspan="5"><div class="empty">No tasks yet. Analyse a transcript to populate the tracker.</div></td></tr></tbody></table></div>
+<div class="actions"><button class="secondary" id="addTask">＋ Add task</button><button class="primary" id="csv">↓ Export tasks CSV</button><button class="ghost" id="report">Copy meeting report</button></div>
+</section>
+<section class="card">
+<div class="section-head"><h3>4. Missing information</h3><span class="tag warn">NEEDS ATTENTION</span></div>
+<div id="issues" class="empty">Missing owners and deadlines will be flagged here.</div>
+</section>
+<section class="card">
+<div class="section-head"><h3>5. Open questions</h3><span class="tag">FOLLOW-UP</span></div>
+<div id="questions" class="empty">Unresolved questions will appear here.</div>
+</section>
+</div>
+<div class="footer">MeetMate AI · Prototype for Agentic Chase Mission 03 · Review AI-assisted outputs before taking action.</div>
+</main>
+<script>
+const sample = "Our hackathon project needs to be completed by next week. Rahul will finish the frontend by Friday. Priya will handle backend integration, but we haven't decided her deadline yet. We also need to complete project documentation, but nobody has taken responsibility for it. The team has decided to conduct another review meeting on Monday. We still need to decide which hosting platform to use.";
+const $ = id => document.getElementById(id);
+let tasks = [], decisions = [], questions = [], summaryText = "";
+$('sample').onclick=()=>{$('transcript').value=sample};
+$('clear').onclick=()=>{$('transcript').value='';reset()};
+function reset(){tasks=[];decisions=[];questions=[];summaryText='';$('summary').className='empty';$('summary').textContent='Your meeting summary will appear here after analysis.';$('decisions').className='empty';$('decisions').textContent='No decisions extracted yet.';$('tasks').innerHTML='<tr><td colspan="5"><div class="empty">No tasks yet.</div></td></tr>';$('issues').className='empty';$('issues').textContent='Missing owners and deadlines will be flagged here.';$('questions').className='empty';$('questions').textContent='Unresolved questions will appear here.';$('taskCount').textContent='0 TASKS'}
+function sentenceSplit(t){return t.replace(/\n+/g,' ').split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean)}
+function analyse(){
+ const raw=$('transcript').value.trim(); if(!raw){alert('Please paste a meeting transcript first.');return}
+ const sentences=sentenceSplit(raw), found=[], dec=[], qs=[];
+ const nameTask=/\b([A-Z][a-z]+)\s+(?:will|has to|needs to|should|is going to)\s+(.+)/;
+ const taskVerb=/\b(need to|needs to|must|should|have to|has to|will|action item:|task:)\s+(.+)/i;
+ sentences.forEach(s=>{
+   let m=s.match(nameTask);
+   if(m){
+     let rest=m[2].replace(/[.!?]+$/,'');
+     let deadline='Not specified', dm=rest.match(/\b(by\s+)?(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|tomorrow|today|next week|next Monday|next Friday|\d{1,2}(?:st|nd|rd|th)?\s+\w+)\b/i);
+     if(dm){deadline=dm[2];rest=rest.replace(dm[0],'').replace(/\s{2,}/g,' ').trim()}
+     found.push({task:rest.replace(/^(to\s+)/i,''),owner:m[1],deadline,status:'Pending',notes:deadline==='Not specified'?'Deadline not stated':''});
+   } else if(/\b(nobody|no one|not decided|unassigned|without an owner)\b/i.test(s) && /\b(task|responsib|owner|deadline|assign)\w*/i.test(s)){
+     let task=(s.match(/(?:complete|finish|prepare|handle|do)\s+([^,.]+)/i)||[])[1]||s.replace(/[.!?]+$/,'');
+     found.push({task:task.trim(),owner:'Unassigned',deadline:'Not specified',status:'Pending',notes:'Owner/deadline needs confirmation'});
+   }
+   if(/\b(decided|agreed|finali[sz]ed|approved|confirmed|will conduct|will hold)\b/i.test(s)) dec.push(s);
+   if(/\b(need to decide|not sure|unclear|open question|still need to decide|what should|which .* should)\b/i.test(s)) qs.push(s);
+   if(!m && taskVerb.test(s) && !/\b(decided|agreed)\b/i.test(s)){
+     let body=(s.match(taskVerb)||[])[2]||s;
+     if(!found.some(x=>x.task.toLowerCase().includes(body.slice(0,18).toLowerCase()))) found.push({task:body.replace(/[.!?]+$/,''),owner:'Unassigned',deadline:'Not specified',status:'Pending',notes:'Owner and deadline not identified'});
+   }
+ });
+ tasks=found;decisions=[...new Set(dec)];questions=[...new Set(qs)];
+ const topic=raw.slice(0,150).replace(/\s+/g,' ');
+ summaryText=`Meeting transcript received (${sentences.length} discussion points). ${tasks.length} potential action item(s) identified and ${decisions.length} decision(s) detected. Please review extracted details and confirm any missing information.`;
+ $('summary').className='summary';$('summary').textContent=summaryText;
+ $('decisions').className=decisions.length?'':'empty';$('decisions').innerHTML=decisions.length?'<ul class="bullet-list">'+decisions.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'No explicit decisions detected.';
+ $('questions').className=questions.length?'':'empty';$('questions').innerHTML=questions.length?'<ul class="bullet-list">'+questions.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'No open questions detected by the demo rules.';
+ render();
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ $('taskCount').textContent=tasks.length+' TASK'+(tasks.length===1?'':'S');
+ $('tasks').innerHTML=tasks.length?tasks.map((t,i)=>`<tr><td><input aria-label="Task" value="${esc(t.task)}" data-i="${i}" data-k="task"></td><td><input aria-label="Owner" value="${esc(t.owner)}" data-i="${i}" data-k="owner"></td><td><input aria-label="Deadline" value="${esc(t.deadline)}" data-i="${i}" data-k="deadline"></td><td><select data-i="${i}" data-k="status"><option ${t.status==='Pending'?'selected':''}>Pending</option><option ${t.status==='In progress'?'selected':''}>In progress</option><option ${t.status==='Done'?'selected':''}>Done</option></select></td><td><input aria-label="Notes" value="${esc(t.notes)}" data-i="${i}" data-k="notes"></td></tr>`).join(''):'<tr><td colspan="5"><div class="empty">No action items identified.</div></td></tr>';
+ $('tasks').querySelectorAll('[data-i]').forEach(el=>el.addEventListener('change',e=>{let i=+e.target.dataset.i,k=e.target.dataset.k;tasks[i][k]=e.target.value;renderIssues()}));
+ renderIssues();
+}
+function renderIssues(){let issues=[];tasks.forEach((t,i)=>{if(!t.owner||/unassigned|not assigned/i.test(t.owner))issues.push(`Task ${i+1}: owner is missing — ${t.task}`);if(!t.deadline||/not specified|unknown|tbd/i.test(t.deadline))issues.push(`Task ${i+1}: deadline is missing — ${t.task}`)});$('issues').className=issues.length?'':'empty';$('issues').innerHTML=issues.length?issues.map(x=>'<div class="flag">⚠ '+esc(x)+'</div>').join(''):'No missing owners or deadlines detected.'}
+$('analyze').onclick=analyse;
+$('addTask').onclick=()=>{tasks.push({task:'New action item',owner:'Unassigned',deadline:'Not specified',status:'Pending',notes:'Please update'});render()};
+$('csv').onclick=()=>{if(!tasks.length){alert('No tasks to export yet.');return}let rows=[['Task','Owner','Deadline','Status','Notes'],...tasks.map(t=>[t.task,t.owner,t.deadline,t.status,t.notes])];let csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='MeetMate_Tasks.csv';a.click();URL.revokeObjectURL(a.href)};
+$('report').onclick=async()=>{if(!summaryText){alert('Analyse a transcript first.');return}let txt='MEETMATE AI — MEETING REPORT\n\n'+summaryText+'\n\nDECISIONS\n'+(decisions.map(x=>'• '+x).join('\n')||'None detected')+'\n\nACTION ITEMS\n'+tasks.map((t,i)=>`${i+1}. ${t.task} | Owner: ${t.owner} | Deadline: ${t.deadline} | Status: ${t.status}`).join('\n')+'\n\nOPEN QUESTIONS\n'+(questions.map(x=>'• '+x).join('\n')||'None detected');try{await navigator.clipboard.writeText(txt);alert('Meeting report copied.')}catch(e){alert(txt)}};
+</script>
+</body></html>
