@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MeetMate AI — Meeting to Action</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c31;--panel2:#1b2741;--text:#eef3ff;--muted:#aab6d0;--line:#2d3b5b;--accent:#8b9cff;--good:#65d6a1;--warn:#ffc66d;--bad:#ff8c9b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0b1020,#111a30);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1050px;margin:auto;padding:24px 16px 60px}.hero{padding:20px 0 12px}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:8px 0}h2{font-size:19px;margin:0 0 12px}.sub{color:var(--muted);max-width:720px}
+.card{background:rgba(20,28,49,.96);border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 12px 32px #0002}
+label{display:block;font-weight:650;margin:10px 0 6px}input,textarea,select{width:100%;background:#0d1528;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}
+textarea{min-height:180px;resize:vertical}input::placeholder,textarea::placeholder{color:#71809f}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1}
+button{border:0;border-radius:10px;padding:11px 16px;font:700 14px system-ui;cursor:pointer;background:var(--accent);color:#0b1020}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button:disabled{opacity:.55;cursor:wait}
+.small{font-size:12px;color:var(--muted)}.notice{background:#1b2944;border-left:3px solid var(--warn);padding:11px 13px;border-radius:8px;color:#e7edff;font-size:13px}
+.status{margin-top:10px;color:var(--muted);min-height:24px}.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700;background:#243250;color:#dce5ff}
+.pill.missing{background:#4b3422;color:#ffd18a}.pill.ok{background:#173d35;color:#9af0c7}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.metric{background:#0e172b;border:1px solid var(--line);border-radius:12px;padding:14px}.metric strong{font-size:25px;display:block}
+ul{padding-left:20px;margin:8px 0}li{margin:5px 0}.task{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:#0e172b}
+.taskgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}.taskgrid label{font-size:12px;color:var(--muted);margin:2px 0 4px}
+footer{color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:600px){main{padding:16px 12px 40px}.taskgrid{grid-template-columns:1fr 1fr}.taskgrid .wide{grid-column:1/-1}.card{padding:14px}}
+</style>
+</head>
+<body><main>
+<header class="hero">
+ <div class="eyebrow">PS03 · Agentic Chase</div>
+ <h1>MeetMate AI</h1>
+ <p class="sub">Turn student-team meeting discussions into clear decisions, action items, owners and deadlines — and flag what the team still needs to decide.</p>
+</header>
+
+<section class="card">
+ <h2>1. Connect Gemini (for this local demo)</h2>
+ <label for="apiKey">Gemini API key</label>
+ <input id="apiKey" type="password" placeholder="Paste your API key here — it stays in this browser tab">
+ <div class="small">Get a key from Google AI Studio. Do not paste your key into GitHub, README, screenshots or a shared document. This demo keeps it in memory only and clears it when you close or refresh the page.</div>
+ <div class="notice" style="margin-top:12px">Security note: this is a quick local prototype that calls Gemini directly from your browser. Do not deploy it publicly with an API key. Tomorrow, move the key into an n8n credential or a secure backend.</div>
+</section>
+
+<section class="card">
+ <h2>2. Add meeting transcript</h2>
+ <label for="transcript">Meeting transcript / notes</label>
+ <textarea id="transcript" placeholder="Paste the meeting transcript here..."></textarea>
+ <div class="row" style="margin-top:12px">
+  <button class="secondary" id="sampleBtn">Load sample meeting</button>
+  <button id="analyzeBtn">Analyse with Gemini</button>
+ </div>
+ <div class="status" id="status" role="status"></div>
+</section>
+
+<section id="results" hidden>
+ <section class="card">
+  <h2>3. Meeting summary</h2>
+  <p id="summary"></p>
+  <div class="grid">
+   <div class="metric"><span class="small">Decisions found</span><strong id="decisionCount">0</strong></div>
+   <div class="metric"><span class="small">Action items</span><strong id="taskCount">0</strong></div>
+   <div class="metric"><span class="small">Needs clarification</span><strong id="missingCount">0</strong></div>
+  </div>
+  <h3>Decisions</h3><ul id="decisions"></ul>
+  <h3>Open questions</h3><ul id="questions"></ul>
+ </section>
+ <section class="card">
+  <h2>4. Action tracker</h2>
+  <p class="small">Review and edit the extracted details before sharing them with your team.</p>
+  <div id="tasks"></div>
+  <div class="row" style="margin-top:12px">
+   <button class="secondary" id="addTask">+ Add task</button>
+   <button class="secondary" id="csvBtn">Export tasks as CSV</button>
+   <button class="secondary" id="reportBtn">Copy meeting report</button>
+  </div>
+ </section>
+</section>
+<footer>MeetMate AI · Prototype stage. AI output can be imperfect; team members should verify owners, dates and decisions before acting.</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const sample = `Our hackathon project needs to be completed by next week. Rahul will finish the frontend by Friday. Priya will handle backend integration, but we haven't decided her deadline yet. We also need to complete project documentation, but nobody has taken responsibility for it. The team has decided to conduct another review meeting on Monday.`;
+let current = {summary:"",decisions:[],tasks:[],open_questions:[]};
+
+$("sampleBtn").addEventListener("click",()=>{$("transcript").value=sample;$("status").textContent="Sample meeting loaded. Add your Gemini API key and tap Analyse with Gemini.";});
+const systemPrompt = `You are MeetMate AI, an accurate meeting-to-action assistant for student teams.
+Read the transcript and return ONLY valid JSON with exactly these keys:
+{
+ "summary": "2-4 sentence summary",
+ "decisions": ["clear decisions actually agreed"],
+ "tasks": [{"task":"specific action","owner":"person name or Unassigned","deadline":"deadline as stated or Not specified","status":"Pending","notes":"brief context; mention missing information"}],
+ "open_questions": ["unresolved questions or information the team must clarify"]
+}
+Rules:
+- Extract only information supported by the transcript. Never invent names, owners, dates, deadlines or decisions.
+- A suggestion or discussion is not a decision unless the team clearly agreed.
+- If no owner is stated, use exactly "Unassigned".
+- If no deadline is stated, use exactly "Not specified".
+- Create separate tasks for separate deliverables.
+- Keep dates exactly as stated unless the transcript gives enough context to resolve them safely.
+- If a deadline is ambiguous (for example "next Friday" without a meeting date), preserve the wording and note that it needs confirmation.
+- Include tasks with missing owners or deadlines; do not omit them.
+- If there are no items for a list, return an empty array.`;
+function cleanJson(text){
+ let t=text.trim().replace(/^```(?:json)?\s*/i,"").replace(/\s*```$/,"");
+ const first=t.indexOf("{"), last=t.lastIndexOf("}");
+ if(first<0||last<first) throw new Error("Gemini did not return valid JSON. Please try again.");
+ return JSON.parse(t.slice(first,last+1));
+}
+$("analyzeBtn").addEventListener("click", analyze);
+async function analyze(){
+ const key=$("apiKey").value.trim(), transcript=$("transcript").value.trim();
+ if(!key){$("status").textContent="Please add your Gemini API key first.";return;}
+ if(!transcript){$("status").textContent="Please paste a meeting transcript first.";return;}
+ const btn=$("analyzeBtn");btn.disabled=true;$("status").textContent="Gemini is analysing the meeting…";
+ try{
+  const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",{
+   method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},
+   body:JSON.stringify({system_instruction:{parts:[{text:systemPrompt}]},contents:[{role:"user",parts:[{text:transcript}]}],generationConfig:{responseMimeType:"application/json",temperature:0.2}})
+  });
+  const data=await response.json();
+  if(!response.ok) throw new Error(data.error?.message||`Gemini request failed (${response.status}). Check your key and model access.`);
+  const raw=data.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("");
+  if(!raw) throw new Error("Gemini returned an empty response. Try again.");
+  current=cleanJson(raw);
+  if(!Array.isArray(current.decisions)||!Array.isArray(current.tasks)||!Array.isArray(current.open_questions)) throw new Error("The response was missing expected fields. Please analyse again.");
+  render();$("status").textContent="Analysis complete. Please review the extracted tasks before sharing.";
+ }catch(err){$("status").textContent="Could not analyse: "+err.message;}
+ finally{btn.disabled=false;}
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function render(){
+ $("results").hidden=false;$("summary").textContent=current.summary||"No summary returned.";
+ $("decisionCount").textContent=current.decisions.length;$("taskCount").textContent=current.tasks.length;
+ const missing=current.tasks.filter(t=>!t.owner||t.owner==="Unassigned"||!t.deadline||t.deadline==="Not specified").length;
+ $("missingCount").textContent=missing;
+ fillList("decisions",current.decisions,"No clear decisions identified.");
+ fillList("questions",current.open_questions,"No open questions identified.");
+ $("tasks").innerHTML="";
+ current.tasks.forEach((t,i)=>{
+  const ownerMissing=!t.owner||t.owner==="Unassigned", deadlineMissing=!t.deadline||t.deadline==="Not specified";
+  const div=document.createElement("div");div.className="task";
+  div.innerHTML=`<div class="row" style="justify-content:space-between"><strong>Task ${i+1}</strong><span>${ownerMissing?'<span class="pill missing">Owner missing</span>':''} ${deadlineMissing?'<span class="pill missing">Deadline missing</span>':''}</span></div>
+  <div class="taskgrid">
+   <div class="wide"><label>Task</label><input data-i="${i}" data-k="task" value="${esc(t.task)}"></div>
+   <div><label>Owner</label><input data-i="${i}" data-k="owner" value="${esc(t.owner)}"></div>
+   <div><label>Deadline</label><input data-i="${i}" data-k="deadline" value="${esc(t.deadline)}"></div>
+   <div><label>Status</label><select data-i="${i}" data-k="status"><option ${t.status==="Pending"?"selected":""}>Pending</option><option ${t.status==="In progress"?"selected":""}>In progress</option><option ${t.status==="Completed"?"selected":""}>Completed</option></select></div>
+   <div class="wide"><label>Notes</label><input data-i="${i}" data-k="notes" value="${esc(t.notes)}"></div>
+  </div>`;
+  $("tasks").appendChild(div);
+ });
+ $("tasks").querySelectorAll("[data-i]").forEach(el=>el.addEventListener("change",e=>{const i=Number(e.target.dataset.i),k=e.target.dataset.k;current.tasks[i][k]=e.target.value;renderCountsOnly();}));
+}
+function renderCountsOnly(){const missing=current.tasks.filter(t=>!t.owner||t.owner==="Unassigned"||!t.deadline||t.deadline==="Not specified").length;$("missingCount").textContent=missing;$("taskCount").textContent=current.tasks.length;}
+function fillList(id,items,empty){$(id).innerHTML="";(items.length?items:[empty]).forEach(v=>{const li=document.createElement("li");li.textContent=v;$(id).appendChild(li);});}
+$("addTask").addEventListener("click",()=>{current.tasks.push({task:"New task",owner:"Unassigned",deadline:"Not specified",status:"Pending",notes:"Please confirm owner and deadline."});render();});
+function csvCell(v){return '"'+String(v??"").replace(/"/g,'""')+'"';}
+$("csvBtn").addEventListener("click",()=>{const rows=[["Task","Owner","Deadline","Status","Notes"],...current.tasks.map(t=>[t.task,t.owner,t.deadline,t.status,t.notes])];const csv=rows.map(r=>r.map(csvCell).join(",")).join("\r\n");download(new Blob([csv],{type:"text/csv;charset=utf-8"}),"meetmate_tasks.csv");});
+$("reportBtn").addEventListener("click",async()=>{const report=`MEETMATE AI — MEETING REPORT\n\nSUMMARY\n${current.summary}\n\nDECISIONS\n${current.decisions.map(x=>"- "+x).join("\n")||"- None identified"}\n\nACTION ITEMS\n${current.tasks.map((t,i)=>`${i+1}. ${t.task}\n   Owner: ${t.owner}\n   Deadline: ${t.deadline}\n   Status: ${t.status}\n   Notes: ${t.notes}`).join("\n\n")}\n\nOPEN QUESTIONS\n${current.open_questions.map(x=>"- "+x).join("\n")||"- None identified"}`;try{await navigator.clipboard.writeText(report);$("status").textContent="Meeting report copied.";}catch(e){$("status").textContent="Clipboard unavailable in this browser. Use CSV export instead.";}}); 
+function download(blob,name){const a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);}
+</script>
+</body></html>
