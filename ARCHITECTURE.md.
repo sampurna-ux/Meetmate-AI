@@ -1,0 +1,110 @@
+MeetMate AI- Project Architecture
+
+1. Project Overview:
+
+MeetMate AI is an AI-powered Meeting-to-Action Bot designed for student teams. It aims to convert unstructured meeting discussions into organised summaries, decisions and actionable tasks.
+
+The main objective is to reduce the effort required to manually prepare meeting minutes, assign responsibilities and track pending work.
+
+
+2. Problem Statement:
+
+Student teams frequently conduct meetings for projects, events and academic activities. However, important decisions, assigned responsibilities and deadlines can get lost in lengthy discussions.
+
+MeetMate AI aims to solve this problem by automatically analysing meeting transcripts and converting them into structured and actionable information.
+
+
+3. Proposed System Architecture:
+
+The proposed workflow consists of the following stages:
+
+1. Meeting Input: Users provide meeting transcripts or discussion notes.
+2. AI-Powered Analysis: Gemini analyses the meeting content and understands the discussion.
+3. Meeting Summary: Important discussion points and decisions are identified.
+4. Task Extraction: Action items are extracted from the discussion.
+5. Responsibility Identification: Task owners and deadlines are identified whenever explicitly mentioned.
+6. Missing Information Detection: Tasks with missing owners or deadlines are flagged for clarification.
+7. Task Storage: Structured task information is intended to be stored in Google Sheets.
+8. Notifications: Telegram is planned for delivering task updates and reminders.
+
+
+4. Agent Design:
+
+The proposed agentic workflow includes three specialised responsibilities:
+
+Agent 1: Meeting Analyst
+
+- Analyses meeting transcripts.
+- Generates concise meeting summaries.
+- Identifies important decisions and discussion points.
+
+Agent 2: Task Manager
+
+- Extracts actionable tasks.
+- Identifies mentioned task owners and deadlines.
+- Detects missing or unclear information.
+- Prepares structured task records.
+
+Agent 3: Follow-up Agent
+
+- Helps track pending tasks.
+- Prepares task reminders and follow-up notifications.
+- Communicates updates through Telegram.
+
+These responsibilities may be implemented as specialised stages coordinated by a central AI agent and workflow.
+
+5. Technology Stack
+
+Technology| Purpose
+Gemini API| AI-powered meeting analysis
+n8n| Workflow automation and agent coordination
+Telegram Bot| User interaction and notifications
+Google Sheets| Task storage and tracking
+HTML, CSS, JavaScript| Browser-based prototype
+GitHub| Version control and project documentation
+
+6. Expected Output
+
+For every meeting, MeetMate AI aims to generate:
+
+- Meeting summary
+- Important decisions
+- List of action items
+- Assigned task owners
+- Deadlines
+- Flags for missing information
+- Task tracking and follow-up updates
+
+7. Current Development Status
+
+The project is currently in the prototype development stage.
+
+Implemented:
+
+- Initial browser-based prototype.
+- Meeting transcript input interface.
+- Basic meeting information and task presentation.
+- Gemini API-powered prototype interface.
+- Project repository and documentation.
+
+Under development / planned:
+
+- Reliable Gemini API analysis.
+- Agentic workflow implementation using n8n.
+- Telegram Bot integration.
+- Google Sheets integration.
+- Automated task follow-ups and reminders.
+
+8. Future Scope
+
+MeetMate AI can be extended to support:
+
+- Audio-to-text meeting transcription.
+- Multiple meeting platforms.
+- Task progress tracking.
+- Automatic deadline reminders.
+- Team performance and meeting insights.
+
+9. Project Goal
+
+Our goal is to make student team meetings more productive by transforming conversations into clear responsibilities, organised tasks and timely follow-ups.
